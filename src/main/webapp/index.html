@@ -5,6 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RoyalBank PaOne</title>
 <script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+.perspective{
+perspective:1000px;
+}
+
+.card{
+width:360px;
+height:220px;
+position:relative;
+transform-style:preserve-3d;
+transition:transform .7s;
+cursor:pointer;
+}
+
+.card.flip{
+transform:rotateY(180deg);
+}
+
+.side{
+position:absolute;
+width:100%;
+height:100%;
+top:0;
+left:0;
+border-radius:12px;
+backface-visibility:hidden;
+}
+
+.back{
+transform:rotateY(180deg);
+}
+
+</style>
 </head>
 
 <body class="bg-gray-100 font-sans">
@@ -55,28 +90,71 @@ Create Account
 
 </div>
 
-<!-- ATM Card -->
-<div class="bg-gray-900 text-white p-6 rounded-xl mb-6">
+<!-- ATM Flip Card -->
+<div class="mb-6 flex justify-center">
 
-<p class="text-lg">ATM Card</p>
-<p class="text-2xl tracking-widest mt-4" id="atmNumber"></p>
+<div class="perspective">
 
-<p class="mt-4">Card Holder: <span id="atmName"></span></p>
-<p class="mt-2">Valid Thru 12/30</p>
+<div id="card" class="card shadow-2xl" onclick="flipCard()">
+
+<!-- FRONT -->
+<div class="side text-white p-6 relative
+bg-gradient-to-r from-blue-900 via-blue-700 to-indigo-700">
+
+<h2 class="text-lg font-bold tracking-widest">RoyalBank PaOne</h2>
+
+<div class="w-12 h-10 bg-yellow-400 rounded mt-6"></div>
+
+<div class="text-xl tracking-widest mt-6 font-semibold"
+id="atmNumber"></div>
+
+<div class="absolute bottom-3 left-6">
+<p class="text-xs opacity-80">CARD HOLDER</p>
+<p id="atmName" class="font-semibold"></p>
+</div>
+
+<div class="absolute bottom-3 right-6 text-right">
+<p class="text-xs opacity-80">VALID THRU</p>
+<p>12/30</p>
+</div>
 
 </div>
 
-<!-- Deposit / Withdraw -->
+<!-- BACK -->
+<div class="side back text-white
+bg-gradient-to-r from-gray-900 to-gray-700">
+
+<div class="bg-black h-12 w-full mt-6"></div>
+
+<div class="mt-10 px-6">
+
+<div class="bg-white h-10 flex items-center justify-end pr-4 text-black font-bold"
+id="cvv"></div>
+
+<p class="text-xs mt-1 text-gray-300 text-right">CVV</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+<!-- Deposit Withdraw -->
 <div class="grid md:grid-cols-2 gap-6">
 
 <div class="bg-white p-6 rounded shadow">
 
 <h3 class="text-xl font-bold mb-3">Deposit</h3>
 
-<input id="depositAmount" type="number" placeholder="Enter amount"
+<input id="depositAmount" type="number"
+placeholder="Enter amount"
 class="border w-full p-2 mb-3 rounded">
 
-<button onclick="deposit()" class="bg-green-600 text-white px-4 py-2 rounded w-full">
+<button onclick="deposit()"
+class="bg-green-600 text-white px-4 py-2 rounded w-full">
 Deposit
 </button>
 
@@ -86,27 +164,16 @@ Deposit
 
 <h3 class="text-xl font-bold mb-3">Withdraw</h3>
 
-<input id="withdrawAmount" type="number" placeholder="Enter amount"
+<input id="withdrawAmount" type="number"
+placeholder="Enter amount"
 class="border w-full p-2 mb-3 rounded">
 
-<button onclick="withdraw()" class="bg-red-600 text-white px-4 py-2 rounded w-full">
+<button onclick="withdraw()"
+class="bg-red-600 text-white px-4 py-2 rounded w-full">
 Withdraw
 </button>
 
 </div>
-
-</div>
-
-<!-- Passbook -->
-<div class="bg-white p-6 rounded shadow mt-6">
-
-<h3 class="text-xl font-bold mb-4">Digital Passbook</h3>
-
-<p><strong>Name:</strong> <span id="pname"></span></p>
-<p><strong>Phone:</strong> <span id="pphone"></span></p>
-<p><strong>Address:</strong> <span id="paddress"></span></p>
-<p><strong>DOB:</strong> <span id="pdob"></span></p>
-<p><strong>Account:</strong> <span id="paccount"></span></p>
 
 </div>
 
@@ -132,12 +199,40 @@ Withdraw
 
 </div>
 
+<!-- Bank Passbook -->
+<div class="bg-white p-6 rounded shadow mt-6">
+
+<h3 class="text-xl font-bold mb-4 text-center">
+RoyalBank PaOne Passbook
+</h3>
+
+<p><b>Name:</b> <span id="pb_name"></span></p>
+<p><b>Account Number:</b> <span id="pb_account"></span></p>
+
+<table class="w-full border mt-4 text-center">
+
+<thead class="bg-blue-200">
+<tr>
+<th class="border p-2">Date</th>
+<th class="border p-2">Description</th>
+<th class="border p-2">Deposit</th>
+<th class="border p-2">Withdraw</th>
+<th class="border p-2">Balance</th>
+</tr>
+</thead>
+
+<tbody id="passbookTable"></tbody>
+
+</table>
+
+</div>
+
 </div>
 </div>
 
 <script>
 
-let balance = 0
+let balance=0
 
 function generateNumber(length){
 
@@ -160,22 +255,25 @@ let dob=document.getElementById("dobInput").value
 
 let accountNumber=generateNumber(12)
 let atmNumber=generateNumber(16)
+let cvv=generateNumber(3)
 
 document.getElementById("holderName").innerText=name
 document.getElementById("accountNumber").innerText=accountNumber
 
 document.getElementById("atmName").innerText=name
 document.getElementById("atmNumber").innerText=atmNumber
+document.getElementById("cvv").innerText=cvv
 
-document.getElementById("pname").innerText=name
-document.getElementById("pphone").innerText=phone
-document.getElementById("paddress").innerText=address
-document.getElementById("pdob").innerText=dob
-document.getElementById("paccount").innerText=accountNumber
+document.getElementById("pb_name").innerText=name
+document.getElementById("pb_account").innerText=accountNumber
 
 document.getElementById("registerPage").classList.add("hidden")
 document.getElementById("dashboard").classList.remove("hidden")
 
+}
+
+function flipCard(){
+document.getElementById("card").classList.toggle("flip")
 }
 
 function updateBalance(){
@@ -197,6 +295,33 @@ document.getElementById("history").innerHTML+=row
 
 }
 
+function addPassbook(type,amount){
+
+let date=new Date().toLocaleDateString()
+
+let deposit=""
+let withdraw=""
+
+if(type=="Deposit"){
+deposit="₹"+amount
+}else{
+withdraw="₹"+amount
+}
+
+let row=`
+<tr>
+<td class="border p-2">${date}</td>
+<td class="border p-2">${type}</td>
+<td class="border p-2">${deposit}</td>
+<td class="border p-2">${withdraw}</td>
+<td class="border p-2">₹${balance}</td>
+</tr>
+`
+
+document.getElementById("passbookTable").innerHTML+=row
+
+}
+
 function deposit(){
 
 let amount=parseInt(document.getElementById("depositAmount").value)
@@ -205,7 +330,9 @@ if(amount>0){
 
 balance+=amount
 updateBalance()
+
 addHistory("Deposit",amount,"Success")
+addPassbook("Deposit",amount)
 
 }
 
@@ -219,12 +346,13 @@ if(amount<=balance){
 
 balance-=amount
 updateBalance()
+
 addHistory("Withdraw",amount,"Success")
+addPassbook("Withdraw",amount)
 
 }else{
 
 alert("❌ Insufficient Balance")
-
 addHistory("Withdraw",amount,"Failed")
 
 }
