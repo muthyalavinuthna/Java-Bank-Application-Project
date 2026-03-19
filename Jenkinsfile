@@ -3,16 +3,16 @@ pipeline {
 
     environment {
 
-        GIT_REPO   = "https://github.com/mehar-pa-45/Java-indigo-Airlines.git"
+        GIT_REPO   = "https://github.com/mehar-pa-45/Java-Bank-Application-Project.git"
         GIT_BRANCH = "main"
 
         DOCKERHUB_USER = "mehardocker45"
-        IMAGE_NAME     = "java-indigo-airlines"
+        IMAGE_NAME     = "Java-Bank-Application-Project"
         IMAGE_TAG      = "${BUILD_NUMBER}"
 
         DOCKER_CREDS   = "Docker_CRED"
 
-        CONTAINER_NAME = "indigo-airlines-container"
+        CONTAINER_NAME = "Bank-Application-container"
         HOST_PORT      = "8081"
         CONTAINER_PORT = "8080"
     }
@@ -21,7 +21,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/mehar-pa-45/Java-indigo-Airlines.git']])
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-cred', url: 'https://github.com/mehar-pa-45/Java-Bank-Application-Project.git']])
             }
         }
 
