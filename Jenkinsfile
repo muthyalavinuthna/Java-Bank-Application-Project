@@ -48,18 +48,5 @@ pipeline {
                 """
             }
         }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh """
-                kubectl apply -f deployment.yaml
-                kubectl apply -f service.yaml
-                kubectl apply -f ingress.yml
-
-                kubectl set image deployment/java-bank-app \
-                java-bank-container=${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-                """
-            }
-        }
     }
 }
