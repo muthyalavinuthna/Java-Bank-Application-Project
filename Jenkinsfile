@@ -18,14 +18,14 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                sh """
-                docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} .
-                docker tag ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_USER}/${IMAGE_NAME}:latest
-                """
-            }
-        }
+       stage('Push Image to DockerHub') {
+    steps {
+        sh """
+        docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
+        docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:latest
+        """
+    }
+}
 
         stage('DockerHub Login') {
             steps {
