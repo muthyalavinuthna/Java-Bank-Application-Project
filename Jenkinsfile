@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_USER = "lakshmivinuthnamutyala"
-        IMAGE_NAME     = "java-bank-application-project"
+        IMAGE_NAME     = "banking-application"
         IMAGE_TAG      = "${BUILD_NUMBER}"
         DOCKER_CREDS   = "docker-credentials"
     }
