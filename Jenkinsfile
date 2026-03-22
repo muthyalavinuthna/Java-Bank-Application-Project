@@ -2,33 +2,27 @@ pipeline {
     agent any
 
     environment {
-
-        GIT_REPO   = "https://github.com/muthyalavinuthna/Java-Bank-Application-Project.git"
-        GIT_BRANCH = "main"
-
         DOCKERHUB_USER = "lakshmivinuthnamutyala"
         IMAGE_NAME     = "java-bank-application-project"
         IMAGE_TAG      = "${BUILD_NUMBER}"
-
         DOCKER_CREDS   = "docker-credentials"
-
-        CONTAINER_NAME = "Bank-Application-container"
-        HOST_PORT      = "8081"
-        CONTAINER_PORT = "8080"
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'Github-Cred', url: 'https://github.com/muthyalavinuthna/Java-Bank-Application-Project.git']])
-                           }
+                git branch: 'main',
+                credentialsId: 'Github-Cred',
+                url: 'https://github.com/muthyalavinuthna/Java-Bank-Application-Project.git'
+            }
         }
 
         stage('Build Docker Image') {
             steps {
                 sh """
                 docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} .
+                docker tag ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_USER}/${IMAGE_NAME}:latest
                 """
             }
         }
@@ -40,10 +34,7 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-
-                    sh """
-                    echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
-                    """
+                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
                 }
             }
         }
@@ -52,20 +43,20 @@ pipeline {
             steps {
                 sh """
                 docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
+                docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:latest
                 """
             }
         }
 
-        stage('Deploy Container') {
+        stage('Deploy to Kubernetes') {
             steps {
                 sh """
-                docker stop ${CONTAINER_NAME} || true
-                docker rm ${CONTAINER_NAME} || true
+                kubectl apply -f deployment.yaml
+                kubectl apply -f service.yaml
+                kubectl apply -f ingress.yml
 
-                docker run -d \
-                -p ${HOST_PORT}:${CONTAINER_PORT} \
-                --name ${CONTAINER_NAME} \
-                ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
+                kubectl set image deployment/java-bank-app \
+                java-bank-container=${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
                 """
             }
         }
