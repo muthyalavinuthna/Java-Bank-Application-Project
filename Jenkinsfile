@@ -6,7 +6,7 @@ pipeline {
         GIT_REPO   = "https://github.com/mehar-pa-45/Java-Bank-Application-Project.git"
         GIT_BRANCH = "main"
 
-        DOCKERHUB_USER = "mehardocker45"
+        DOCKERHUB_USER = "lakshmivinuthnamutyala"
         IMAGE_NAME     = "java-bank-application-project"
         IMAGE_TAG      = "${BUILD_NUMBER}"
 
@@ -21,7 +21,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'Github-Cred', url: 'https://github.com/mehar-pa-45/Java-Bank-Application-Project.git']])
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'Github-Cred', url: 'https://github.com/muthyalavinuthna/Java-Bank-Application-Project.git']])
                            }
         }
 
