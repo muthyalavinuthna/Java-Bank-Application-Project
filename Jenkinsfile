@@ -13,7 +13,7 @@ pipeline {
             steps {
                 git branch: 'main',
                 credentialsId: 'Github-Cred',
-                url: 'https://github.com/muthyalavinuthna/Java-Bank-Application-Project.git'
+                url: 'https://github.com/ankitanallamilli/Java-Bank-Application-Project.git'
             }
         }
 
