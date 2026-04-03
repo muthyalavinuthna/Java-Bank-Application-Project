@@ -36,7 +36,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t sriramyaganni/bank-webapp:latest .'
+                sh 'docker build -t lakshmivinuthnamutyala/bank-webapp:latest .'
             }
         }
 
@@ -44,7 +44,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh 'echo $PASS | docker login -u $USER --password-stdin'
-                    sh 'docker push sriramyaganni/bank-webapp:latest'
+                    sh 'docker push lakshmivinuthnamutyala/bank-webapp:latest'
                 }
             }
         }
