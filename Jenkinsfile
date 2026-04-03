@@ -36,7 +36,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t lakshmivinuthnamutyala/bank-webapp:latest .'
+                sh 'docker build -t lakshmivinuthnamutyala/banking-application:latest .'
             }
         }
 
@@ -44,14 +44,14 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh 'echo $PASS | docker login -u $USER --password-stdin'
-                    sh 'docker push lakshmivinuthnamutyala/bank-webapp:latest'
+                    sh 'docker push lakshmivinuthnamutyala/banking-application:latest'
                 }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f bank_deployment.yml'
+                sh 'kubectl apply -f Deployment.yml'
             }
         }
     }
