@@ -7,7 +7,7 @@
 
  <groupId>org.apache.maven.plugins</groupId>
  <artifactId>maven-war-plugin</artifactId>
- <version>3.3.2</version>
+ <version>3.3.2-SNAPSHOT</version>
  <packaging>war</packaging>
 
  <name>java-Bank-Application-Project</name>
