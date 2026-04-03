@@ -5,9 +5,9 @@
 
  <modelVersion>4.0.0</modelVersion>
 
- <groupId>com.indigo</groupId>
- <artifactId>java-Bank-Application-Project</artifactId>
- <version>1.0</version>
+ <groupId>org.apache.maven.plugins</groupId>
+ <artifactId>maven-war-plugin</artifactId>
+ <version>3.3.2</version>
  <packaging>war</packaging>
 
  <name>java-Bank-Application-Project</name>
