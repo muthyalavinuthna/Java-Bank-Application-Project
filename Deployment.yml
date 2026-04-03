@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: bank-container
-          image: sriramyaganni/bank-webapp:latest
+          image: lakshmivinuthnamutyala/bank-webapp:latest
           ports:
             - containerPort: 8080
 ---
