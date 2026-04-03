@@ -1,6 +1,17 @@
 pipeline {
     agent any
+
+    tools {
+        maven 'maven3'
+        jdk 'jdk17'
+    }
+
+    environment {
+        DOCKER_IMAGE = "lakshmivinuthnamutyala/banking-application:${BUILD_NUMBER}"
+    }
+
     stages {
+
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
@@ -8,43 +19,58 @@ pipeline {
                     url: 'https://github.com/muthyalavinuthna/Java-Bank-Application-Project.git'
             }
         }
+
         stage('Build Maven') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package -DskipTests'
             }
         }
+
         stage('SonarQube Analysis'){ 
             steps { 
                 withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar' 
+                    sh 'mvn sonar:sonar'
                 } 
             } 
         } 
+
         stage('Quality Gate') {
             steps { 
-                timeout(time: 2, unit: 'MINUTES') { 
+                timeout(time: 5, unit: 'MINUTES') { 
                     waitForQualityGate abortPipeline: true 
                 }
             }
         }
-        stage('Artifact in Nexus') { 
+
+        stage('Deploy Artifact to Nexus') { 
             steps { 
-                withMaven(globalMavenSettingsConfig: 'settings.xml', jdk: 'jdk17', maven: 'maven', traceability: true) { 
-                    sh 'mvn deploy' 
+                withMaven(
+                    maven: 'maven3',
+                    jdk: 'jdk17',
+                    globalMavenSettingsConfig: 'settings.xml'
+                ) { 
+                    sh 'mvn deploy -DskipTests'
                 } 
             } 
         }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t lakshmivinuthnamutyala/banking-application:latest .'
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
         stage('Docker Login & Push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
-                    sh 'docker push lakshmivinuthnamutyala/banking-application:latest'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push $DOCKER_IMAGE
+                    '''
                 }
             }
         }
@@ -53,6 +79,15 @@ pipeline {
             steps {
                 sh 'kubectl apply -f Deployment.yml'
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline executed successfully ✅"
+        }
+        failure {
+            echo "Pipeline failed ❌"
         }
     }
 }
