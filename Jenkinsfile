@@ -26,10 +26,16 @@ pipeline {
             }
         }
 
+        // ✅ REPLACED SONAR STAGE (IMPORTANT FIX)
         stage('SonarQube Analysis'){ 
             steps { 
                 withSonarQubeEnv('sq') {
-                    sh 'mvn sonar:sonar'
+                    sh '''
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=banking-app \
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.login=$SONAR_AUTH_TOKEN
+                    '''
                 } 
             } 
         } 
@@ -42,11 +48,12 @@ pipeline {
             }
         }
 
+        // ✅ FIXED JDK CONSISTENCY (use jdk21)
         stage('Deploy Artifact to Nexus') { 
             steps { 
                 withMaven(
                     maven: 'maven3',
-                    jdk: 'jdk17',
+                    jdk: 'jdk21',
                     globalMavenSettingsConfig: 'settings.xml'
                 ) { 
                     sh 'mvn deploy -DskipTests'
